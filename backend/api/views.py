@@ -27,3 +27,36 @@ def addEmployee(request):
         serializer.save()
         return Response(f"Employee successfully added {serializer.data}")
     return Response(serializer.errors)
+
+
+@api_view(['PUT'])
+def putEmployee(request):
+    employeeData = request.data
+    try:
+        oldEmployeeData = Employee.objects.get(id=employeeData['id'])
+    except Employee.DoesNotExist:
+        return Response('Please provide a valid Employee ID')
+    serializer = EmployeeSerializer(oldEmployeeData, data=employeeData)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(f"Employee successfully replaced {serializer.data}")
+    return Response(serializer.errors)
+
+
+@api_view(['PATCH'])
+def patchEmployee(request):
+    employeeData = request.data
+    oldEmployeeData = Employee.objects.get(id=employeeData['id'])
+    serializer = EmployeeSerializer(
+        oldEmployeeData, data=employeeData, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(f"Employee successfully modified {serializer.data}")
+    return Response(serializer.errors)
+
+
+@api_view(['DELETE'])
+def deleteEmployee(request):
+    delEmployee = request.data
+    Employee.objects.get(id=delEmployee['id']).delete()
+    return Response("Employee successfully deleted")
